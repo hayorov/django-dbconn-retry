@@ -7,9 +7,6 @@ from django.db import utils as django_db_utils
 from django.db.backends.base import base as django_db_base
 from django.dispatch import Signal
 
-#from typing import Union, Tuple, Callable, List  # noqa. flake8 #118
-
-
 _log = logging.getLogger(__name__)
 default_app_config = 'django_dbconn_retry.DjangoIntegration'
 
@@ -56,14 +53,15 @@ def monkeypatch_django():
                     if isinstance(e, _operror_types):
                         if not hasattr(self, "_connection_retries"):
                             self._connection_retries = 0
-                        if self._connection_retries >= 1:
+                        if self._connection_retries >= self.settings_dict.get("MAX_RETRIES", 1):
                             _log.error("Reconnecting to the database didn't help %s", str(e))
                             del self._in_connecting
                             post_reconnect.send(self.__class__, dbwrapper=self)
                             raise
                         else:
-                            import traceback; traceback.print_exc("retry in 5s")
-                            time.sleep(5)
+                            retry_delay = self.settings_dict.get("RETRY_DELAY", None)
+                            if retry_delay:
+                                time.sleep(retry_delay)
                             _log.info("Database connection failed. Refreshing...")
                             # mark the retry
                             self._connection_retries += 1
