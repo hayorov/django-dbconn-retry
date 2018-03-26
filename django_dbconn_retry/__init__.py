@@ -1,12 +1,13 @@
 # -* encoding: utf-8 *-
 import logging
+import time
 
 from django.apps.config import AppConfig
 from django.db import utils as django_db_utils
 from django.db.backends.base import base as django_db_base
 from django.dispatch import Signal
 
-from typing import Union, Tuple, Callable, List  # noqa. flake8 #118
+#from typing import Union, Tuple, Callable, List  # noqa. flake8 #118
 
 
 _log = logging.getLogger(__name__)
@@ -40,8 +41,8 @@ else:
     _operror_types += (MySQLdb.OperationalError,)
 
 
-def monkeypatch_django() -> None:
-    def ensure_connection_with_retries(self: django_db_base.BaseDatabaseWrapper) -> None:
+def monkeypatch_django():
+    def ensure_connection_with_retries(self):
         if self.connection is not None and hasattr(self.connection, 'closed') and self.connection.closed:
             _log.debug("failed connection detected")
             self.connection = None
@@ -53,15 +54,19 @@ def monkeypatch_django() -> None:
                     self.connect()
                 except Exception as e:
                     if isinstance(e, _operror_types):
-                        if hasattr(self, "_connection_retries") and self._connection_retries >= 1:
+                        if not hasattr(self, "_connection_retries"):
+                            self._connection_retries = 0
+                        if self._connection_retries >= 1:
                             _log.error("Reconnecting to the database didn't help %s", str(e))
                             del self._in_connecting
                             post_reconnect.send(self.__class__, dbwrapper=self)
                             raise
                         else:
+                            import traceback; traceback.print_exc("retry in 5s")
+                            time.sleep(5)
                             _log.info("Database connection failed. Refreshing...")
                             # mark the retry
-                            self._connection_retries = 1
+                            self._connection_retries += 1
                             # ensure that we retry the connection. Sometimes .closed isn't set correctly.
                             self.connection = None
                             del self._in_connecting
@@ -87,5 +92,5 @@ def monkeypatch_django() -> None:
 class DjangoIntegration(AppConfig):
     name = "django_dbconn_retry"
 
-    def ready(self) -> None:
+    def ready(self):
         monkeypatch_django()
