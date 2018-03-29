@@ -2,9 +2,9 @@
 import sys
 import logging
 
-from unittest.mock import Mock
+from mock import Mock
 
-from typing import Any
+#from typing import Any
 
 import django_dbconn_retry as ddr
 

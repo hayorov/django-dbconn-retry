@@ -17,7 +17,7 @@ from django.conf.urls import url
 from django.http import HttpRequest, HttpResponse
 
 
-def testview(request: HttpRequest) -> HttpResponse:
+def testview(request):
     return HttpResponse("nothing here", content_type='text/plain', status=200)
 
 

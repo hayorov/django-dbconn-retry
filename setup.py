@@ -12,7 +12,7 @@ except IOError:
 
 
 setup(
-    name="django-dbconn-retry",
+    name="django-dbconn-retry-python27",
     version="0.1.5",
     packages=[
         'django_dbconn_retry',
@@ -25,15 +25,14 @@ setup(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Intended Audience :: System Administrators",
-        "Programming Language :: Python :: 3 :: Only",
         "License :: OSI Approved :: BSD License",
         "Operating System :: POSIX",
     ],
     url="https://github.com/jdelic/django-dbconn-retry/",
-    author="Jonas Maurus (@jdelic)",
-    author_email="jonas-dbconn-retry@gopythongo.com",
+    author="Jonas Maurus (@jdelic) (original), Scott Baker (python2.7 port)",
+    author_email="jonas-dbconn-retry@gopythongo.com, scottb@opennetworking.org",
     maintainer="GoPythonGo.com",
-    maintainer_email="info@gopythongo.com",
+    maintainer_email="info@gopythongo.com, scottb@opennetworking.org",
     description="Patch Django to retry a database connection first before failing.",
     long_description=long_description,
 
