@@ -41,6 +41,18 @@ Just pull the library in using ``pip install django-dbconn-retry``. Then add
 ``django_dbconn_retry`` to ``INSTALLED_APPS`` in your ``settings.py``.
 
 
+Settings
+---------------
+
+DATABASES = {
+    'default': {
+        ...
+        'MAX_RETRIES': 2,  #
+        'RETRY_DELAY': .500,  # in seconds
+    }
+}
+
+
 Signals
 -------
 The library provides an interface for other code to plug into the process to,
